@@ -1,17 +1,18 @@
 {
-  "name": "retrier",
+  "name": "@poomcha/retrier",
   "version": "1.0.0",
-  "description": "Create retries on synchronous or asynchronous functions.",
+  "description": "Retry synchronous or asynchronous functions.",
   "main": "index.ts",
+  "files": ["src/helpers/*.ts", "src/retrier/*.ts", "src/index.ts", "README.md"],
   "scripts": {
     "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "TODO"
+    "url": "git+https://github.com/Poomcha/retrier.git"
   },
   "keywords": [
-    "TODO"
+    "retry retrier error success sync async typescript"
   ],
   "author": "Poomcha",
   "license": "ISC",

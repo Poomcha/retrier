@@ -1,4 +1,4 @@
-import { Retrier } from "./retrier/Retrier";
+import { Retrier } from "./src/retrier/Retrier";
 
 /**
  * Retries a synchronous operation, with a specified number of retries.

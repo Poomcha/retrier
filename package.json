@@ -1,6 +1,6 @@
 {
   "name": "@poomcha/retrier",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Retry synchronous or asynchronous functions.",
   "main": "index.ts",
   "files": ["src/helpers/*.ts", "src/retrier/*.ts", "index.ts", "README.md"],

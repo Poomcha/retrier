@@ -139,21 +139,77 @@ const result = retrier.retrySync(() => {
 ```
 
 #### Failure Example
+
 ```typescript
 const retrier = new Retrier({
-maxRetries: 3,
-onFailure: {
-callback: (error) => console.error('Operation failed:', error.message),
-override: true
-}
+  maxRetries: 3,
+  onFailure: {
+    callback: (error) => console.error("Operation failed:", error.message),
+    override: true,
+  },
 });
 
 const result = retrier.retrySync(() => {
-throw new Error('Operation failed');
+  throw new Error("Operation failed");
 });
 
 // Output: Operation failed: Operation failed
 ```
 
+#### Complex context
+
+```typescript
+import { Retrier } from "@poomcha/retrier";
+
+export class Example {
+  private client: Client;
+
+  private retrier: Retrier;
+  private readonly retrierOptions: RetrierOptions<void, string> = {
+    maxRetries: 2,
+    delay: 1000,
+    onSuccess: {
+      callback: function (_res) {
+        return;
+      },
+      args: [],
+      override: false,
+    },
+    onFailure: {
+      callback: function (error) {
+        console.error(error);
+
+        return `Error: Example Unavailable.`;
+      },
+      args: [],
+      override: true,
+    },
+  };
+
+  constructor() {
+    this.client = new ExampleClient();
+    this.retrier = new Retrier(this.retrierOptions);
+  }
+
+  public async queryExample(apiCallOptions) {
+    const callApi = async function (options) {
+      return await this.client.exampleGet(apiCallOptions);
+    };
+
+    const apiCallOptions = {
+      // ...
+    };
+
+    // In context such as classes, make sure to bind this to your callback to keep track of the context
+    const response = await this.retrier.retryAsync(queryExample.bind(this), [
+      apiCallOptions,
+    ]);
+
+    return response;
+  }
+}
+```
+
 ## License
+
 This project is licensed under the ISC License.

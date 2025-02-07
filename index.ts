@@ -1,4 +1,4 @@
-import { Retrier } from "./src/retrier/Retrier";
+import { Retrier } from './src/retrier/Retrier';
 
 /**
  * Retries a synchronous operation, with a specified number of retries.
@@ -57,7 +57,7 @@ const retrySync = Retrier.retryStaticSync;
  * @param options - Optionnal options.
  *
  * @param options.delay - Positive integer, delay between 2 retry.
- * 
+ *
  * @param options.onSuccess -
  * @param options.onSuccess.callback - Function to run on success.
  * @param options.onSuccess.args - Optionnal arguments for onSuccess.callback,

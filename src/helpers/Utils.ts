@@ -23,7 +23,7 @@ class UtilsNumber {
    */
   static checkIntegerNumber(n: number): number {
     if (this.isInteger(n)) return n;
-    throw new Error("NonSafeIntegerError");
+    throw new Error('NonSafeIntegerError');
   }
   /**
    * Returns true if n is positive. Else raise NonPositiveError.
@@ -33,7 +33,7 @@ class UtilsNumber {
    */
   static checkPositiveNumber(n: number): number {
     if (this.isPositive(n)) return n;
-    throw new Error("NonPositiveError");
+    throw new Error('NonPositiveError');
   }
   /**
    * Returns true if n is a positive integer
@@ -70,13 +70,13 @@ class UtilsCallback {
   }
   /**
    * Call a callback function with or without its arguments asynchronously and return its result or throw error.
-   * 
+   *
    * @param callback
    * @param args Optionnal
    */
   static async callAsyncCallback<T>(
     callback: (args?: any[]) => Promise<T>,
-    args?: any[]
+    args?: any[],
   ): Promise<T> {
     try {
       if (args) {

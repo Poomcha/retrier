@@ -23,7 +23,7 @@ yarn add retrier
 Import the Retrier class and its methods into your project:
 
 ```typescript
-import { Retrier, retrySync, retryAsync } from "retrier";
+import { Retrier, retrySync, retryAsync } from 'retrier';
 ```
 
 ### Configuration
@@ -36,12 +36,12 @@ const retrier = new Retrier({
   delay: 1000, // Delay between retries in milliseconds
   onSuccess: {
     // Callback on success
-    callback: (result) => console.log("Operation succeeded:", result),
+    callback: (result) => console.log('Operation succeeded:', result),
     override: true, // Override default behavior
   },
   onFailure: {
     // Callback on failure
-    callback: (error) => console.error("Operation failed:", error),
+    callback: (error) => console.error('Operation failed:', error),
     override: true, // Override default behavior
   },
 });
@@ -56,8 +56,8 @@ Retries a synchronous operation:
 ```typescript
 const result = retrier.retrySync(() => {
   // Your synchronous operation here
-  if (Math.random() > 0.5) throw new Error("Random failure");
-  return "Success";
+  if (Math.random() > 0.5) throw new Error('Random failure');
+  return 'Success';
 });
 
 console.log(result);
@@ -70,8 +70,8 @@ Retries an asynchronous operation:
 ```typescript
 const result = await retrier.retryAsync(async () => {
   // Your asynchronous operation here
-  if (Math.random() > 0.5) throw new Error("Random failure");
-  return "Success";
+  if (Math.random() > 0.5) throw new Error('Random failure');
+  return 'Success';
 });
 
 console.log(result);
@@ -86,8 +86,8 @@ You can also use the static methods without instantiating the class:
 ```typescript
 const result = retrySync(5, () => {
   // Your synchronous operation here
-  if (Math.random() > 0.5) throw new Error("Random failure");
-  return "Success";
+  if (Math.random() > 0.5) throw new Error('Random failure');
+  return 'Success';
 });
 
 console.log(result);
@@ -98,8 +98,8 @@ console.log(result);
 ```typescript
 const result = await retryAsync(5, async () => {
   // Your asynchronous operation here
-  if (Math.random() > 0.5) throw new Error("Random failure");
-  return "Success";
+  if (Math.random() > 0.5) throw new Error('Random failure');
+  return 'Success';
 });
 
 console.log(result);
@@ -110,13 +110,13 @@ console.log(result);
 - maxRetries: Maximum number of retries (default: 2).
 - delay: Delay between retries in milliseconds (default: 0).
 - onSuccess: Callback executed on success.
-- callback: Function to run on success.
-- args: Additional arguments for the callback.
-- override: If true, overrides the default behavior.
+- onSuccess.callback: Function to run on success.
+- onSuccess.args: Additional arguments for the callback.
+- onSuccess.override: If true, overrides the default behavior.
 - onFailure: Callback executed on failure.
-- callback: Function to run on failure.
-- args: Additional arguments for the callback.
-- override: If true, overrides the default behavior.
+- onFailure.callback: Function to run on failure.
+- onFailure.args: Additional arguments for the callback.
+- onFailure.override: If true, overrides the default behavior.
 
 ### Examples
 
@@ -126,13 +126,13 @@ console.log(result);
 const retrier = new Retrier({
   maxRetries: 3,
   onSuccess: {
-    callback: (result) => console.log("Operation succeeded:", result),
+    callback: (result) => console.log('Operation succeeded:', result),
     override: true,
   },
 });
 
 const result = retrier.retrySync(() => {
-  return "Operation completed";
+  return 'Operation completed';
 });
 
 // Output: Operation succeeded: Operation completed
@@ -144,13 +144,13 @@ const result = retrier.retrySync(() => {
 const retrier = new Retrier({
   maxRetries: 3,
   onFailure: {
-    callback: (error) => console.error("Operation failed:", error.message),
+    callback: (error) => console.error('Operation failed:', error.message),
     override: true,
   },
 });
 
 const result = retrier.retrySync(() => {
-  throw new Error("Operation failed");
+  throw new Error('Operation failed');
 });
 
 // Output: Operation failed: Operation failed
@@ -159,13 +159,13 @@ const result = retrier.retrySync(() => {
 #### Complex context
 
 ```typescript
-import { Retrier } from "@poomcha/retrier";
+import { Retrier } from '@poomcha/retrier';
 
 export class Example {
-  private client: Client;
+  private client;
 
-  private retrier: Retrier;
-  private readonly retrierOptions: RetrierOptions<void, string> = {
+  private retrier;
+  private readonly retrierOptions = {
     maxRetries: 2,
     delay: 1000,
     onSuccess: {

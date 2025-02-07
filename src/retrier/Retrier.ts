@@ -1,18 +1,32 @@
-/*
- * TODO
- * - Complete documentation
- * - Refactor tests
- */
+import { UtilsNumber, UtilsCallback } from '../helpers/Utils';
 
-import {
-  EffectCallback,
-  RetrierOptions,
-  RetryOptionsAsync,
-  RetryOptionsSync,
-  SetRetrierOptions,
-} from "./types";
+//#region Types
+interface EffectCallback<T> {
+  callback: (...args: any) => T | Promise<T>;
+  args?: any[];
+  override?: boolean;
+}
 
-import { UtilsNumber, UtilsCallback } from "../helpers/Utils";
+type RetryOptionsSync<OnSuccess, OnFailure> = {
+  onSuccess?: EffectCallback<OnSuccess>;
+  onFailure?: EffectCallback<OnFailure>;
+};
+
+type RetryOptionsAsync<OnSuccess, OnFailure> = {
+  delay?: number;
+} & RetryOptionsSync<OnSuccess, OnFailure>;
+
+type RetrierOptions<OnSuccess, OnFailure> = {
+  maxRetries?: number;
+} & RetryOptionsAsync<OnSuccess, OnFailure>;
+
+type SetRetrierOptions<OnSuccess, OnFailure> = {
+  maxRetries: number;
+  delay: number;
+  onSuccess?: EffectCallback<OnSuccess>;
+  onFailure?: EffectCallback<OnFailure>;
+};
+//#endregion
 
 /**
  * The Retrier class provides methods to retry operations synchronously and asynchronously
@@ -23,14 +37,14 @@ import { UtilsNumber, UtilsCallback } from "../helpers/Utils";
  */
 class Retrier {
   //#region Members
-  private _maxRetries: number;
-  private readonly _maxRetriesDefault: number = 2;
+  protected _maxRetries: number = 0;
+  protected readonly _maxRetriesDefault: number = 2;
 
-  private _delay: number;
-  private readonly _delayDefault: number = 0;
+  protected _delay: number = 0;
+  protected readonly _delayDefault: number = 0;
 
-  private _onSuccess: EffectCallback<any> | undefined = undefined;
-  private _onFailure: EffectCallback<any> | undefined = undefined;
+  protected _onSuccess: EffectCallback<any> | undefined = undefined;
+  protected _onFailure: EffectCallback<any> | undefined = undefined;
   //#endregion
 
   //#region Constructor
@@ -203,7 +217,7 @@ class Retrier {
     maxRetries: number,
     callback: (...args: any[]) => T,
     args?: any[],
-    options?: RetryOptionsSync<OnSuccess, OnFailure>
+    options?: RetryOptionsSync<OnSuccess, OnFailure>,
   ): T | OnSuccess | OnFailure {
     try {
       return Retrier._retrySync(callback, maxRetries, args, options);
@@ -230,7 +244,7 @@ class Retrier {
    * @param options - Optionnal options.
    *
    * @param options.delay - Positive integer, delay between 2 retry.
-   * 
+   *
    * @param options.onSuccess -
    * @param options.onSuccess.callback - Function to run on success.
    * @param options.onSuccess.args - Optionnal arguments for onSuccess.callback,
@@ -253,7 +267,7 @@ class Retrier {
     maxRetries: number,
     callback: (...args: any[]) => Promise<T>,
     args?: any[],
-    options?: RetryOptionsAsync<OnSuccess, OnFailure>
+    options?: RetryOptionsAsync<OnSuccess, OnFailure>,
   ): Promise<T | OnSuccess | OnFailure> {
     try {
       return await Retrier._retryAsync(callback, maxRetries, args, options);
@@ -282,7 +296,7 @@ class Retrier {
    * @param options - Optionnal options, overule instance configuration.
    *
    * @param options.maxRetries - Positive integer, max number of retries <code>(Number[0, MAX_SAFE_INTEGER])</code>.
-   * 
+   *
    * @param options.onSuccess -
    * @param options.onSuccess.callback - Function to run on success.
    * @param options.onSuccess.args - Optionnal arguments for onSuccess.callback,
@@ -304,18 +318,18 @@ class Retrier {
   public retrySync<T, OnSuccess, OnFailure>(
     callback: (...args: any[]) => T,
     args?: any[],
-    options?: RetrierOptions<OnSuccess, OnFailure>
+    options?: RetrierOptions<OnSuccess, OnFailure>,
   ): T | OnSuccess | OnFailure {
     try {
       const computedOptions = this.makeOptionsSync<OnSuccess, OnFailure>(
-        options
+        options,
       );
 
       return Retrier._retrySync<T, OnSuccess, OnFailure>(
         callback,
         computedOptions.maxRetries,
         args,
-        computedOptions
+        computedOptions,
       );
     } catch (error) {
       throw error;
@@ -339,9 +353,9 @@ class Retrier {
    * @param options - Optionnal options.
    *
    * @param options.maxRetries - Positive integer, max number of retries <code>(Number[0, MAX_SAFE_INTEGER])</code>.
-   * 
+   *
    * @param options.delay - Positive integer, delay between 2 retry.
-   * 
+   *
    * @param options.onSuccess -
    * @param options.onSuccess.callback - Function to run on success.
    * @param options.onSuccess.args - Optionnal arguments for onSuccess.callback,
@@ -363,18 +377,18 @@ class Retrier {
   public async retryAsync<T, OnSuccess, OnFailure>(
     callback: (...args: any[]) => Promise<T>,
     args?: any[],
-    options?: RetrierOptions<OnSuccess, OnFailure>
+    options?: RetrierOptions<OnSuccess, OnFailure>,
   ): Promise<T | OnSuccess | OnFailure> {
     try {
       const computedOptions = this.makeOptionsAsync<OnSuccess, OnFailure>(
-        options
+        options,
       );
 
       return await Retrier._retryAsync<T, OnSuccess, OnFailure>(
         callback,
         computedOptions.maxRetries,
         args,
-        computedOptions
+        computedOptions,
       );
     } catch (error) {
       throw error;
@@ -397,7 +411,7 @@ class Retrier {
     callback: (...args: any[]) => T,
     retry: number,
     args?: any[],
-    options?: RetryOptionsSync<OnSuccess, OnFailure>
+    options?: RetryOptionsSync<OnSuccess, OnFailure>,
   ): T | OnSuccess | OnFailure {
     let onSuccess: EffectCallback<OnSuccess> | undefined;
     let onFailure: EffectCallback<OnFailure> | undefined;
@@ -410,7 +424,7 @@ class Retrier {
       if (onSuccess) {
         const onSuccessRes = UtilsCallback.callSyncCallback<OnSuccess>(
           onSuccess.callback as (args?: any[]) => OnSuccess,
-          [res, ...(onSuccess.args || [])]
+          [res, ...(onSuccess.args || [])],
         );
         if (onSuccess.override) {
           return onSuccessRes;
@@ -426,7 +440,7 @@ class Retrier {
       if (onFailure) {
         const onFailureRes = UtilsCallback.callSyncCallback<OnFailure>(
           onFailure.callback as (args?: any[]) => OnFailure,
-          [error, ...(onFailure.args || [])]
+          [error, ...(onFailure.args || [])],
         );
         if (onFailure.override) {
           return onFailureRes;
@@ -451,7 +465,7 @@ class Retrier {
     callback: (...args: any[]) => Promise<T>,
     retry: number,
     args?: any[],
-    options?: RetryOptionsAsync<OnSuccess, OnFailure>
+    options?: RetryOptionsAsync<OnSuccess, OnFailure>,
   ): Promise<T | OnSuccess | OnFailure> {
     let onSuccess: EffectCallback<OnSuccess> | undefined;
     let onFailure: EffectCallback<OnFailure> | undefined;
@@ -465,7 +479,7 @@ class Retrier {
       if (onSuccess) {
         const onSuccessRes = await UtilsCallback.callAsyncCallback<OnSuccess>(
           onSuccess.callback as (args?: any[]) => Promise<OnSuccess>,
-          [res, ...(onSuccess.args || [])]
+          [res, ...(onSuccess.args || [])],
         );
         if (onSuccess.override) {
           return onSuccessRes;
@@ -487,7 +501,7 @@ class Retrier {
       if (onFailure) {
         const onFailureRes = await UtilsCallback.callAsyncCallback<OnFailure>(
           onFailure.callback as (args?: any[]) => Promise<OnFailure>,
-          [error, ...(onFailure.args || [])]
+          [error, ...(onFailure.args || [])],
         );
         if (onFailure.override) {
           return onFailureRes;
@@ -504,7 +518,7 @@ class Retrier {
    * @param options
    */
   private makeOptionsSync<OnSuccess, OnFailure>(
-    options: RetrierOptions<OnSuccess, OnFailure> | undefined
+    options: RetrierOptions<OnSuccess, OnFailure> | undefined,
   ): SetRetrierOptions<OnSuccess, OnFailure> {
     let computedOptions = options;
 
@@ -539,7 +553,7 @@ class Retrier {
    * @param options
    */
   private makeOptionsAsync<OnSuccess, OnFailure>(
-    options: RetrierOptions<OnSuccess, OnFailure> | undefined
+    options: RetrierOptions<OnSuccess, OnFailure> | undefined,
   ): SetRetrierOptions<OnSuccess, OnFailure> {
     let computedOptions = options;
 
@@ -570,5 +584,13 @@ class Retrier {
   }
   //#endregion
 }
+
+export type {
+  EffectCallback,
+  RetrierOptions,
+  RetryOptionsSync,
+  RetryOptionsAsync,
+  SetRetrierOptions,
+};
 
 export { Retrier };

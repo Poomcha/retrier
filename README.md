@@ -7,13 +7,13 @@
 To install `retrier`, use npm or yarn:
 
 ```bash
-npm install retrier
+npm install @poomcha/retrier
 ```
 
 or
 
 ```bash
-yarn add retrier
+yarn add @poomcha/retrier
 ```
 
 ## Usage
@@ -23,7 +23,7 @@ yarn add retrier
 Import the Retrier class and its methods into your project:
 
 ```typescript
-import { Retrier, retrySync, retryAsync } from 'retrier';
+import { Retrier, retrySync, retryAsync } from '@poomcha/retrier';
 ```
 
 ### Configuration
